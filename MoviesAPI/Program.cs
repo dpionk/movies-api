@@ -10,7 +10,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DataContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+builder.Services.AddCors((options =>
+{
+    options.AddPolicy("uiApp", policyBuilder =>
+    {
+        policyBuilder.WithOrigins("http::/localhost:5173");
+        policyBuilder.AllowAnyHeader();
+        policyBuilder.AllowAnyMethod();
+        policyBuilder.AllowCredentials();
+    });
+}));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -18,6 +27,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors("uiApp");
 }
 
 app.UseHttpsRedirection();
